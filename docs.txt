@@ -1,0 +1,3 @@
+in program:
+1. find people by putting duration for their time
+2. find people by name in any order
