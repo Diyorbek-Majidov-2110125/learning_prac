@@ -1,56 +1,37 @@
 package main
 
 import (
+	"app/config"
 	"app/controller"
 	"app/models"
+	"app/storage"
 	"fmt"
+	"log"
 )
 
 func main() {
 
-	users := controller.GenerateUser(76)
-	for _, user := range users {
-		fmt.Println(user)
-	}
-	// users, err := controller.GetListUsers(models.GetListRequest{
-	// 	Offset: 20,
-	// 	Limit:  15,
-	// })
-	// if err {
-	// 	panic(users)
-	// }
+	cfg := config.Load()
 
-	//page
-	// fmt.Println("The number of pages: ", controller.AllPages())
-	// var number int
-	// fmt.Println("Enter the number of page:")
-	// fmt.Scanln(&number)
-	// users = controller.GetPageByNumber(number)
-
-	// users =  controller.GetByName(users,models.GetListRequest{})
-	// for _, user := range users {
-	// 	fmt.Println(user)
-	// }
-
-	fmt.Println("\nEnter the duration(from and to..e.x \"2023-10-17\"):")
-	var from,to string
-	fmt.Print("\nfromDate: ")
-	fmt.Scanln(&from)
-	fmt.Print("toDate:")
-	fmt.Scanln(&to)
-	fmt.Println()
-	users, err := controller.SortByDate(models.GetListDate{
-		ToDate: to,
-		FromDate: from,
-	})
+	store, err := storage.NewFileJson(&cfg)
 	if err != nil {
-		fmt.Println(err)
+		panic("error while connect to json file: " + err.Error())
+	}
+
+	c := controller.NewController(&cfg, store)
+
+	id, err := c.CreateUser(
+		&models.CreateUser{
+			Name: "Diyorbek",
+			Surname: "Majidov",
+			Birthday: "2001-10-30",
+		},
+	)
+	if err != nil {
+		log.Println("error while CreateUser:", err.Error())
 		return
 	}
-	if len(users) == 0 {
-		fmt.Println("result: No match")
-	}
-	for _, user := range users {
-		fmt.Println(user)
-	}
+
+	fmt.Println(id)
+
 }
