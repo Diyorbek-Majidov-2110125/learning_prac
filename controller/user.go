@@ -24,22 +24,43 @@ func (c *Controller) CreateUser(req *models.CreateUser)(id int, err error) {
 	return id, nil
 }
 
+func (c *Controller) GetListUsers(req *models.GetListRequest)(res *models.GetListResponse, err error) {
+
+	res, err = c.store.User.GetListUsers(req)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (c *Controller)  GetByPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
+	res, err = c.store.User.GetByPkey(req)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (c *Controller) Update(id int, req *models.UpdateUser) (res int, err error) {
+	res, err = c.store.User.Update(id, req)
+	if err != nil {
+		return 1, err
+	}
+	return res, nil
+}
+
+func (c *Controller) Delete(req *models.UserPrimaryKey) (res int, err error) {
+	res, err = c.store.User.Delete(req)
+	if err != nil {
+		return 1, nil
+	}
+	return res, nil
+}
+
 // func CreateUser(data models.User) {
 // 	Users = append(Users, data)
 // }
 
-// func GetListUsers(req models.GetListRequest) (res []models.User, err error) {
-
-// 	if req.Offset > len(Users) {
-// 		return []models.User{}, errors.New("out of range")
-// 	}
-
-// 	if req.Offset+req.Limit > len(Users) {
-// 		return Users[req.Offset:], nil
-// 	}
-
-// 	return Users[req.Offset : req.Offset+req.Limit], nil
-// }
 
 // func GetByUserId(id int) (res models.User, err bool) {
 // 	for _, user := range Users {
