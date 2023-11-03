@@ -14,11 +14,11 @@ import "app/models"
 
 var Users []models.User
 
-func (c *Controller) CreateUser(req *models.CreateUser)(id int, err error) {
+func (c *Controller) CreateUser(req *models.CreateUser)(id string, err error) {
 
-	id, err = c.store.User.Create(req)
+	id, err = c.store.User().Create(req)
 	if err != nil {
-		return 0, err
+		return "error:", err
 	}
 
 	return id, nil
@@ -26,7 +26,7 @@ func (c *Controller) CreateUser(req *models.CreateUser)(id int, err error) {
 
 func (c *Controller) GetListUsers(req *models.GetListRequest)(res *models.GetListResponse, err error) {
 
-	res, err = c.store.User.GetListUsers(req)
+	res, err = c.store.User().GetList(req)
 	if err != nil {
 		return nil, err
 	}
@@ -34,23 +34,23 @@ func (c *Controller) GetListUsers(req *models.GetListRequest)(res *models.GetLis
 }
 
 func (c *Controller)  GetByPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
-	res, err = c.store.User.GetByPkey(req)
+	res, err = c.store.User().GetPkey(req)
 	if err != nil {
 		return nil, err
 	}
 	return
 }
 
-func (c *Controller) Update(id int, req *models.UpdateUser) (res int, err error) {
-	res, err = c.store.User.Update(id, req)
+func (c *Controller) Update(req *models.UpdateUser) (res string, err error) {
+	res, err = c.store.User().Update(req)
 	if err != nil {
-		return 1, err
+		return "error", err
 	}
 	return res, nil
 }
 
 func (c *Controller) Delete(req *models.UserPrimaryKey) (res int, err error) {
-	res, err = c.store.User.Delete(req)
+	res, err = c.store.User().Delete(req)
 	if err != nil {
 		return 1, nil
 	}

@@ -1,4 +1,4 @@
-package storage
+package jsondb
 
 import (
 	"app/models"
@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 type userRepo struct {
@@ -21,31 +23,24 @@ func NewUserRepo(fileName string, file *os.File) *userRepo {
 	}
 }
 
-func (u *userRepo) Create(req *models.CreateUser) (id int, err error) {
+func (u *userRepo) Create(req *models.CreateUser) (id string, err error) {
 
 	var users []*models.User
+
+	id = uuid.New().String()
 	err = json.NewDecoder(u.file).Decode(&users)
 	if err != nil {
-		return 0, err
+		return "Error:", err
 	}
 
-	if len(users) > 0 {
-		id = users[len(users)-1].Id + 1
-		users = append(users, &models.User{
-			Id:       id,
-			Name:     req.Name,
-			Surname:  req.Surname,
-			Birthday: req.Birthday,
-		})
-	} else {
-		id = 1
-		users = append(users, &models.User{
-			Id:       id,
-			Name:     req.Name,
-			Surname:  req.Surname,
-			Birthday: req.Birthday,
-		})
-	}
+	
+	users = append(users, &models.User{
+		Id:       id,
+		Name:     req.Name,
+		Surname:  req.Surname,
+		Birthday: req.Birthday,
+	})
+	
 
 	body, err := json.MarshalIndent(users, " ", " ")
 	if err != nil {
@@ -60,7 +55,7 @@ func (u *userRepo) Create(req *models.CreateUser) (id int, err error) {
 	return id, nil
 }
 
-func (u *userRepo) GetListUsers(req *models.GetListRequest) (res *models.GetListResponse, err error) {
+func (u *userRepo) GetList(req *models.GetListRequest) (res *models.GetListResponse, err error) {
 
 	fileContent, err := os.ReadFile(u.fileName)
 	if err != nil {
@@ -90,7 +85,7 @@ func (u *userRepo) GetListUsers(req *models.GetListRequest) (res *models.GetList
 	}, nil
 }
 
-func (u *userRepo) GetByPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
+func (u *userRepo) GetPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
 	fileContent, err := os.ReadFile(u.fileName)
 	if err != nil {
 		return nil, err
@@ -116,7 +111,7 @@ func (u *userRepo) GetByPkey(req *models.UserPrimaryKey) (res *models.User, err 
 	return res, err
 }
 
-func (u userRepo) Update(id int, req *models.UpdateUser) (res int, err error) {
+func (u userRepo) Update(req *models.UpdateUser) (res string, err error) {
 
 	fileContent, err := os.ReadFile(u.fileName)
 	if err != nil {
@@ -132,8 +127,8 @@ func (u userRepo) Update(id int, req *models.UpdateUser) (res int, err error) {
 	}
 
 	for ind, user := range users {
-		if user.Id == id {
-			res = id
+		if user.Id == req.Id {
+			res = req.Id
 			users[ind].Name = req.Name
 			users[ind].Surname = req.Surname
 			users[ind].Birthday = req.Birthday
@@ -141,9 +136,9 @@ func (u userRepo) Update(id int, req *models.UpdateUser) (res int, err error) {
 		}
 	}
 
-	updatedData, err := json.MarshalIndent(users," ", " ")
+	updatedData, err := json.MarshalIndent(users, " ", " ")
 	if err != nil {
-		return 1, err
+		return "error:", err
 	}
 
 	err = os.WriteFile(u.fileName, updatedData, 0644)
@@ -176,7 +171,7 @@ func (u *userRepo) Delete(req *models.UserPrimaryKey) (res int, err error) {
 		}
 	}
 
-	updatedData, err := json.MarshalIndent(users," ", " ")
+	updatedData, err := json.MarshalIndent(users, " ", " ")
 	if err != nil {
 		fmt.Println("error:", err)
 		return

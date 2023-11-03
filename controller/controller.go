@@ -7,10 +7,10 @@ import (
 
 type Controller struct {
 	cfg *config.Config
-	store *storage.Store
+	store storage.StorageI
 }
 
-func NewController(cfg *config.Config, store *storage.Store) *Controller {
+func NewController(cfg *config.Config, store storage.StorageI) *Controller {
 	
 	return &Controller{
 		cfg: cfg,

@@ -4,7 +4,7 @@ import (
 	"app/config"
 	"app/controller"
 	"app/models"
-	"app/storage"
+	"app/storage/jsondb"
 	"fmt"
 	"log"
 )
@@ -13,17 +13,18 @@ func main() {
 
 	cfg := config.Load()
 
-	store, err := storage.NewFileJson(&cfg)
+	jsondb, err := jsondb.NewFileJson(&cfg)
 	if err != nil {
 		panic("error while connect to json file: " + err.Error())
 	}
+	defer jsondb.CloseDB()
 
-	c := controller.NewController(&cfg, store)
+	c := controller.NewController(&cfg, jsondb)
 
 //Create User:::::>
 	// id, err := c.CreateUser(
 	// 	&models.CreateUser{
-	// 		Name: "Diyorbek",
+	// 		Name: "Mustafo",
 	// 		Surname: "Majidov",
 	// 		Birthday: "2001-10-30",
 	// 	},
@@ -37,7 +38,7 @@ func main() {
 
 //GetlistUsers::::>
 	// users, err := c.GetListUsers(&models.GetListRequest{
-	// 	Offset: 2,
+	// 	Offset: 1,
 	// 	Limit: 8,
 	// 	Search: "",
 	// })
@@ -51,18 +52,19 @@ func main() {
 	// }
 
 //GetUserById::::>
-	// user, err := c.GetByPkey(&models.UserPrimaryKey{
-	// 	Id: 5,
-	// })
-	// if err != nil {
-	// 	log.Println("error: ", err)
-	// 	return
-	// }
-	// fmt.Println(*user)
+	user, err := c.GetByPkey(&models.UserPrimaryKey{
+		Id: "668f9621-62bb-45ea-af3f-82a40713b4d7",
+	})
+	if err != nil {
+		log.Println("error: ", err)
+		return
+	}
+	fmt.Println(*user)
 
 //Update::::>
 
-		// id , err := c.Update(4, &models.UpdateUser{
+		// id , err := c.Update(&models.UpdateUser{
+		// 	Id: "",
 		// 	Name: "Jasurbek",
 		// 	Surname: "Abdullaev",
 		// 	Birthday: "23-01-2001",
@@ -85,14 +87,14 @@ func main() {
 
 // Delete :::::::>
 
-			number, err := c.Delete(&models.UserPrimaryKey{
-				Id: 6,
-			})
-			if err != nil {
-				log.Println("error:", err)
-				return
-			}
+			// number, err := c.Delete(&models.UserPrimaryKey{
+			// 	Id: 6,
+			// })
+			// if err != nil {
+			// 	log.Println("error:", err)
+			// 	return
+			// }
 
-			fmt.Println(number)
+			// fmt.Println(number)
 
 }
