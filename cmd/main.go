@@ -1,56 +1,100 @@
 package main
 
 import (
+	"app/config"
 	"app/controller"
 	"app/models"
+	"app/storage/jsondb"
 	"fmt"
+	"log"
 )
 
 func main() {
 
-	users := controller.GenerateUser(76)
-	for _, user := range users {
-		fmt.Println(user)
+	cfg := config.Load()
+
+	jsondb, err := jsondb.NewFileJson(&cfg)
+	if err != nil {
+		panic("error while connect to json file: " + err.Error())
 	}
-	// users, err := controller.GetListUsers(models.GetListRequest{
-	// 	Offset: 20,
-	// 	Limit:  15,
+	defer jsondb.CloseDB()
+
+	c := controller.NewController(&cfg, jsondb)
+
+//Create User:::::>
+	// id, err := c.CreateUser(
+	// 	&models.CreateUser{
+	// 		Name: "Mustafo",
+	// 		Surname: "Majidov",
+	// 		Birthday: "2001-10-30",
+	// 	},
+	// )
+	// if err != nil {
+	// 	log.Println("error while CreateUser:", err.Error())
+	// 	return
+	// }
+
+	// fmt.Println(id)
+
+//GetlistUsers::::>
+	// users, err := c.GetListUsers(&models.GetListRequest{
+	// 	Offset: 1,
+	// 	Limit: 8,
+	// 	Search: "",
 	// })
-	// if err {
-	// 	panic(users)
+	// if err != nil {
+	// 	log.Println("error is coming from GetlistUsers...")
+	// 	return
 	// }
 
-	//page
-	// fmt.Println("The number of pages: ", controller.AllPages())
-	// var number int
-	// fmt.Println("Enter the number of page:")
-	// fmt.Scanln(&number)
-	// users = controller.GetPageByNumber(number)
-
-	// users =  controller.GetByName(users,models.GetListRequest{})
-	// for _, user := range users {
-	// 	fmt.Println(user)
+	// for _, user := range users.Users {
+	// 	fmt.Println(user.Id,user.Name,user.Surname, user.Birthday)
 	// }
 
-	fmt.Println("\nEnter the duration(from and to..e.x \"2023-10-17\"):")
-	var from,to string
-	fmt.Print("\nfromDate: ")
-	fmt.Scanln(&from)
-	fmt.Print("toDate:")
-	fmt.Scanln(&to)
-	fmt.Println()
-	users, err := controller.SortByDate(models.GetListDate{
-		ToDate: to,
-		FromDate: from,
+//GetUserById::::>
+	user, err := c.GetByPkey(&models.UserPrimaryKey{
+		Id: "668f9621-62bb-45ea-af3f-82a40713b4d7",
 	})
 	if err != nil {
-		fmt.Println(err)
+		log.Println("error: ", err)
 		return
 	}
-	if len(users) == 0 {
-		fmt.Println("result: No match")
-	}
-	for _, user := range users {
-		fmt.Println(user)
-	}
+	fmt.Println(*user)
+
+//Update::::>
+
+		// id , err := c.Update(&models.UpdateUser{
+		// 	Id: "",
+		// 	Name: "Jasurbek",
+		// 	Surname: "Abdullaev",
+		// 	Birthday: "23-01-2001",
+		// })
+		// if err != nil {
+		// 	log.Println("error: ", err)
+		// 	return
+		// }
+
+		// user, err := c.GetByPkey(&models.UserPrimaryKey{
+		// 	Id: id,
+		// })
+		// if err != nil {
+		// 	log.Println("error", err)
+		// 	return
+		// }
+		// fmt.Println(*user)
+
+
+
+// Delete :::::::>
+
+			// number, err := c.Delete(&models.UserPrimaryKey{
+			// 	Id: 6,
+			// })
+			// if err != nil {
+			// 	log.Println("error:", err)
+			// 	return
+			// }
+
+			// fmt.Println(number)
+
 }
