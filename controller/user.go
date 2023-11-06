@@ -12,7 +12,7 @@ import "app/models"
 
 // "github.com/bxcodec/faker/v3"
 
-var Users []models.User
+// var Users []models.User
 
 func (c *Controller) CreateUser(req *models.CreateUser)(id string, err error) {
 

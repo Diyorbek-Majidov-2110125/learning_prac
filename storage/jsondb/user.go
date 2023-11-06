@@ -108,7 +108,7 @@ func (u *userRepo) GetPkey(req *models.UserPrimaryKey) (res *models.User, err er
 			break
 		}
 	}
-	return res, err
+	return res, nil
 }
 
 func (u userRepo) Update(req *models.UpdateUser) (res string, err error) {
