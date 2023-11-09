@@ -8,18 +8,24 @@ import (
 
 type Store struct {
 	user *userRepo
+	product *productRepo
+	shopcart *shopcartRepo
 }
 
 func NewFileJson(cfg *config.Config) (storage.StorageI, error) {
 
-	// if doesFileExist(cfg.Path + cfg.UserFileName) {
-	// 	_, err := os.Create(cfg.UserFileName)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// }
 
 	userFile, err := os.Open(cfg.Path + cfg.UserFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	productFile, err := os.Open(cfg.Path + cfg.ProductFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	shopcartFile, err := os.Open(cfg.Path + cfg.ShopcartFileName)
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +33,8 @@ func NewFileJson(cfg *config.Config) (storage.StorageI, error) {
 
 	return &Store{
 		user: NewUserRepo(cfg.Path+cfg.UserFileName, userFile),
+		product: NewProductRepo(cfg.Path + cfg.ProductFileName, productFile),
+		shopcart: NewShopcartRepo(cfg.Path + cfg.ShopcartFileName, shopcartFile),
 	}, nil
 }
 
@@ -38,7 +46,12 @@ func (s *Store) User() storage.UserRepoI {
 	return s.user
 }
 
-// func doesFileExist(fileName string) bool {
-// 	_, error := os.Stat(fileName)
-// 	return os.IsNotExist(error)
-// }
+func (s *Store) Product() storage.ProductRepoI {
+	return s.product
+}
+
+func (s *Store) Shopcart() storage.ShopcartRepoI {
+	return s.shopcart
+}
+
+

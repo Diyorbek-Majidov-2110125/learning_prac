@@ -1,0 +1,12 @@
+[
+  {
+   "id": "9301f49a-c4b1-4e22-b715-74ef85ba5e99",
+   "name": "apple",
+   "price": 12000
+  },
+  {
+   "id": "af122f7e-e33b-4ace-b68a-8b8c3cd16caf",
+   "name": "banana",
+   "price": 19000
+  }
+ ]

@@ -1,6 +1,10 @@
 package controller
 
-import "app/models"
+import (
+	"app/models"
+	"app/pkg/util"
+	"errors"
+)
 
 // "bufio"
 // "errors"
@@ -12,7 +16,7 @@ import "app/models"
 
 // "github.com/bxcodec/faker/v3"
 
-var Users []models.User
+// var Users []models.User
 
 func (c *Controller) CreateUser(req *models.CreateUser)(id string, err error) {
 
@@ -34,6 +38,11 @@ func (c *Controller) GetListUsers(req *models.GetListRequest)(res *models.GetLis
 }
 
 func (c *Controller)  GetByPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
+
+	if !util.IsValidUUID(req.Id) {
+		return nil, errors.New("invalid ID")
+	}
+
 	res, err = c.store.User().GetPkey(req)
 	if err != nil {
 		return nil, err
@@ -42,6 +51,11 @@ func (c *Controller)  GetByPkey(req *models.UserPrimaryKey) (res *models.User, e
 }
 
 func (c *Controller) Update(req *models.UpdateUser) (res string, err error) {
+
+	if !util.IsValidUUID(req.Id) {
+		return "", errors.New("invalid ID")
+	}
+
 	res, err = c.store.User().Update(req)
 	if err != nil {
 		return "error", err
@@ -50,6 +64,11 @@ func (c *Controller) Update(req *models.UpdateUser) (res string, err error) {
 }
 
 func (c *Controller) Delete(req *models.UserPrimaryKey) (res int, err error) {
+
+	if !util.IsValidUUID(req.Id) {
+		return 1, errors.New("invalid ID")
+	}
+
 	res, err = c.store.User().Delete(req)
 	if err != nil {
 		return 1, nil
