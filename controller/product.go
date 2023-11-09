@@ -2,6 +2,8 @@ package controller
 
 import (
 	"app/models"
+	"app/pkg/util"
+	"errors"
 	"log"
 )
 
@@ -27,6 +29,10 @@ func (c *Controller) GetListProducts(req *models.GetListProductRequest) (res *mo
 
 func (c *Controller) UpdateProduct(req *models.UpdateProduct) (res string, err error) {
 	
+	if !util.IsValidUUID(req.Id) {
+		return req.Id, errors.New("invalid Id")
+	}
+
 	res, err = c.store.Product().Update(req)
 	if err != nil {
 		log.Println("Calling UpdateProduct method in Controller:", err)
@@ -37,6 +43,11 @@ func (c *Controller) UpdateProduct(req *models.UpdateProduct) (res string, err e
 }
 
 func (c *Controller) GetProductByPkey(req *models.ProductPrimaryKey) (res *models.Product, err error) {
+
+	if !util.IsValidUUID(req.Id) {
+		return nil, errors.New("Invalid ID")
+	}
+
 	res, err = c.store.Product().GetPkey(req)
 	if err != nil {
 		log.Println("Calling GetProductPkey in controller:", err)
@@ -47,6 +58,11 @@ func (c *Controller) GetProductByPkey(req *models.ProductPrimaryKey) (res *model
 }
 
 func (c *Controller) DeleteProduct(req *models.ProductPrimaryKey) (res int, err error) {
+
+	if !util.IsValidUUID(req.Id) {
+		return 1, errors.New("Invalid ID")
+	}
+
 	res, err = c.store.Product().Delete(req)
 	if err != nil {
 		log.Println("Calling DeleteProduct method in Controller:", err)

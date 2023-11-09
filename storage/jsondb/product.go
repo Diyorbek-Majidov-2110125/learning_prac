@@ -71,7 +71,7 @@ func (p *productRepo) GetList(req *models.GetListProductRequest) (res *models.Ge
 	}
 
 	if req.Offset > len(products) {
-		return nil, errors.New("Out of range")
+		return nil, errors.New("out of range")
 	}
 
 	if req.Offset + req.Limit > len(products) {

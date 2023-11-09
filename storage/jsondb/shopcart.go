@@ -4,6 +4,8 @@ import (
 	"app/models"
 	"encoding/json"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 type shopcartRepo struct {
@@ -27,7 +29,9 @@ func (sh *shopcartRepo) AddShopcart(req *models.AddShopcart) (res *models.Shopca
 		return nil, err
 	}
 
+	id := uuid.New().String()
 	res = &models.Shopcart{
+		Id: id,
 		User_id: req.User_id,
 		Product_id: req.Product_id,
 		Count: req.Count,
@@ -80,3 +84,7 @@ func (sh *shopcartRepo) RemoveShopcart(req *models.RemoveShopcart) (res string, 
 
 	return "Successfully deleted", nil
 }
+
+// func (sh *shopcartRepo) GetShopcartById(req *models.ShopcartPrimaryKey) (res *models.Shopcart, err error) {
+
+// }
