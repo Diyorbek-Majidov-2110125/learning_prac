@@ -15,6 +15,8 @@ type UserRepoI interface {
 	GetList(*models.GetListRequest) (*models.GetListResponse, error)
 	Update(*models.UpdateUser) (string, error)
 	Delete(*models.UserPrimaryKey) (int, error)
+	GetByName(*models.GetListRequest) (*[]models.User, error)
+	ChooseByBirthDate(*models.GetListDate) ([]models.User, error)
 }
 
 type ProductRepoI interface {
@@ -28,4 +30,7 @@ type ProductRepoI interface {
 type ShopcartRepoI interface{
 	AddShopcart(*models.AddShopcart) (*models.Shopcart, error)
 	RemoveShopcart(*models.RemoveShopcart) (string, error)
+	GetbyId(*models.ShopcartPrimaryKey)(*models.Shopcart, error)
+	GetUserShopcart(*models.CalculateShop)([]models.Shopcart, error)
+	UpdateStatus(*models.UpdateStatus)(string,error)
 }

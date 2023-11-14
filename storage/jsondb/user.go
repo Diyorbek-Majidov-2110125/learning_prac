@@ -2,11 +2,14 @@ package jsondb
 
 import (
 	"app/models"
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -33,14 +36,13 @@ func (u *userRepo) Create(req *models.CreateUser) (id string, err error) {
 		return "Error:", err
 	}
 
-	
 	users = append(users, &models.User{
 		Id:       id,
 		Name:     req.Name,
 		Surname:  req.Surname,
 		Birthday: req.Birthday,
+		Balance:  req.Balance,
 	})
-	
 
 	body, err := json.MarshalIndent(users, " ", " ")
 	if err != nil {
@@ -98,6 +100,7 @@ func (u *userRepo) GetPkey(req *models.UserPrimaryKey) (res *models.User, err er
 		return nil, err
 	}
 
+	found := false
 	res = &models.User{}
 	for _, user := range *users {
 		if req.Id == user.Id {
@@ -105,11 +108,19 @@ func (u *userRepo) GetPkey(req *models.UserPrimaryKey) (res *models.User, err er
 			res.Name = user.Name
 			res.Surname = user.Surname
 			res.Birthday = user.Birthday
+			res.Balance = user.Balance
+			found = true
 			break
 		}
 	}
+
+	if !found {
+		return nil, fmt.Errorf("user with ID %s not found", req.Id)
+	}
+
 	return res, nil
 }
+
 
 func (u userRepo) Update(req *models.UpdateUser) (res string, err error) {
 
@@ -132,6 +143,7 @@ func (u userRepo) Update(req *models.UpdateUser) (res string, err error) {
 			users[ind].Name = req.Name
 			users[ind].Surname = req.Surname
 			users[ind].Birthday = req.Birthday
+			users[ind].Balance = req.Balance
 			break
 		}
 	}
@@ -184,3 +196,78 @@ func (u *userRepo) Delete(req *models.UserPrimaryKey) (res int, err error) {
 	}
 	return 0, nil
 }
+
+func (u *userRepo) GetByName(req *models.GetListRequest) (res *[]models.User, err error) {
+
+	var users *[]models.User
+	filContent, err := os.ReadFile(u.fileName)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(filContent, &users)
+	if err != nil {
+		return nil, err
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter your full name: ")
+
+	fullName, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+
+	req.Search = strings.TrimSpace(fullName)
+
+	results := []models.User{}
+	for _, user := range *users {
+		if strings.Contains(strings.ToLower(user.Name)+" "+strings.ToLower(user.Surname), strings.ToLower(req.Search)) || strings.Contains(strings.ToLower(user.Surname)+" "+strings.ToLower(user.Name), strings.ToLower(req.Search)) {
+			results = append(results, user)
+			continue
+		}
+		if strings.Contains(strings.ToLower(user.Name), strings.ToLower(req.Search)) || strings.Contains(strings.ToLower(user.Surname), strings.ToLower(req.Search)) {
+			results = append(results, user)
+		}
+	}
+
+	return &results, nil
+}
+
+func (u *userRepo) ChooseByBirthDate(req *models.GetListDate) (res []models.User, err error) {
+
+	var users *[]models.User
+	filContent, err := os.ReadFile(u.fileName)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(filContent, &users)
+	if err != nil {
+		return nil, err
+	}
+
+	fromDate, err1 := time.Parse("2006-01-02", req.FromDate)
+	toDate, err2 := time.Parse("2006-01-02", req.ToDate)
+
+	if err1 != nil || err2 != nil {
+		return nil, fmt.Errorf("error in time parsing: %v, %v", err1, err2)
+	}
+
+	if fromDate.After(toDate) {
+		return nil, fmt.Errorf("error: 'fromDate' is after 'toDate'")
+	}
+
+	for _, user := range *users {
+		birthday, err := time.Parse("2006-01-02", user.Birthday)
+		if err != nil {
+			return nil, fmt.Errorf("error in parsing: %v", err)
+		}
+		if (birthday.After(fromDate) && birthday.Before(toDate)) || birthday.Equal(fromDate) || birthday.Equal(toDate) {
+			res = append(res, user)
+		}
+	}
+
+	return res, nil
+}
+
+

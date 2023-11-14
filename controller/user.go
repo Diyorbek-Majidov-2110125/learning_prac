@@ -18,7 +18,7 @@ import (
 
 // var Users []models.User
 
-func (c *Controller) CreateUser(req *models.CreateUser)(id string, err error) {
+func (c *Controller) CreateUser(req *models.CreateUser) (id string, err error) {
 
 	id, err = c.store.User().Create(req)
 	if err != nil {
@@ -28,7 +28,7 @@ func (c *Controller) CreateUser(req *models.CreateUser)(id string, err error) {
 	return id, nil
 }
 
-func (c *Controller) GetListUsers(req *models.GetListRequest)(res *models.GetListResponse, err error) {
+func (c *Controller) GetListUsers(req *models.GetListRequest) (res *models.GetListResponse, err error) {
 
 	res, err = c.store.User().GetList(req)
 	if err != nil {
@@ -37,7 +37,7 @@ func (c *Controller) GetListUsers(req *models.GetListRequest)(res *models.GetLis
 	return
 }
 
-func (c *Controller)  GetByPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
+func (c *Controller) GetByPkey(req *models.UserPrimaryKey) (res *models.User, err error) {
 
 	if !util.IsValidUUID(req.Id) {
 		return nil, errors.New("invalid ID")
@@ -76,10 +76,99 @@ func (c *Controller) Delete(req *models.UserPrimaryKey) (res int, err error) {
 	return res, nil
 }
 
+func (c *Controller) GetByName(req *models.GetListRequest) (res *[]models.User, err error) {
+	
+	res, err = c.store.User().GetByName(req)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (c *Controller) ChooseByBirthDate(req *models.GetListDate) (res []models.User, err error) {
+	res, err = c.store.User().ChooseByBirthDate(req)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (c *Controller) WithdrawUserBalance(id *models.UserPrimaryKey, balance float64) error {
+
+	user, err := c.store.User().GetPkey(&models.UserPrimaryKey{Id: id.Id})
+	if err != nil {
+		return err
+	}
+
+	if user.Balance < balance {
+		return errors.New("not available balance")
+	}
+
+	user.Balance = user.Balance - balance
+	_, err = c.store.Shopcart().UpdateStatus(&models.UpdateStatus{
+		User_id: user.Id,
+	})
+	if err != nil {
+		return err
+	}
+
+	
+	_, err = c.store.User().Update(&models.UpdateUser{
+		Id: user.Id,
+		Name: user.Name,
+		Surname: user.Surname,
+		Birthday: user.Birthday,
+		Balance: user.Balance,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Controller) TransferBalance(req *models.TransferBalance) (res string, err error) {
+
+
+	sender, err := c.store.User().GetPkey(&models.UserPrimaryKey{
+		Id: req.SenderId,
+	})
+	if err != nil {
+		return "failure", errors.New("sender not found")
+	}
+	receiver, err := c.store.User().GetPkey(&models.UserPrimaryKey{
+		Id: req.ReceiverId,
+	})
+	if err != nil {
+		return "failure", errors.New("receiver not found")
+	}
+
+	if sender.Balance < req.Money  + req.Money * req.Service_fee_percentage/100 {
+		return "not enough money", errors.New("not enough balance available")
+	}
+
+	_, err = c.store.User().Update(&models.UpdateUser{
+		Id: req.SenderId,
+		Balance: sender.Balance - (req.Money + req.Service_fee_percentage * req.Money/100),
+	})
+	if err != nil {
+		return "Sender Updated unsuccessfully", err
+	}
+
+	_, err = c.store.User().Update(&models.UpdateUser{
+		Id: req.ReceiverId,
+		Balance: receiver.Balance + req.Money,
+	})
+	if err != nil {
+		return "Reciever Updated unsuccessfully", err
+	}
+	return "Success", nil
+}
+
+
+
 // func CreateUser(data models.User) {
 // 	Users = append(Users, data)
 // }
-
 
 // func GetByUserId(id int) (res models.User, err bool) {
 // 	for _, user := range Users {
@@ -147,31 +236,6 @@ func (c *Controller) Delete(req *models.UserPrimaryKey) (res int, err error) {
 // 	return Users
 // }
 
-// func GetByName(users []models.User, req models.GetListRequest) []models.User {
-
-// 	reader := bufio.NewReader(os.Stdin)
-// 	fmt.Print("Enter your full name: ")
-
-// 	fullName, err := reader.ReadString('\n')
-// 	if err != nil {
-// 		fmt.Println("Error:", err)
-// 		return nil
-// 	}
-
-// 	req.Search = strings.TrimSpace(fullName)
-
-// 	results := []models.User{}
-// 	for _, user := range users {
-// 		if strings.Contains(strings.ToLower(user.Name)+" "+strings.ToLower(user.Surname), strings.ToLower(req.Search)) || strings.Contains(strings.ToLower(user.Surname)+" "+strings.ToLower(user.Name), strings.ToLower(req.Search)) {
-// 			results = append(results, user)
-// 			continue
-// 		}
-// 		if strings.Contains(strings.ToLower(user.Name), strings.ToLower(req.Search)) || strings.Contains(strings.ToLower(user.Surname), strings.ToLower(req.Search)) {
-// 			results = append(results, user)
-// 		}
-// 	}
-// 	return results
-// }
 // func SortByDate(req models.GetListDate) ([]models.User, error) {
 // 	users := []models.User{}
 

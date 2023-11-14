@@ -28,7 +28,7 @@ func (c *Controller) GetListProducts(req *models.GetListProductRequest) (res *mo
 }
 
 func (c *Controller) UpdateProduct(req *models.UpdateProduct) (res string, err error) {
-	
+
 	if !util.IsValidUUID(req.Id) {
 		return req.Id, errors.New("invalid Id")
 	}
@@ -38,14 +38,14 @@ func (c *Controller) UpdateProduct(req *models.UpdateProduct) (res string, err e
 		log.Println("Calling UpdateProduct method in Controller:", err)
 		return
 	}
-	
+
 	return res, nil
 }
 
 func (c *Controller) GetProductByPkey(req *models.ProductPrimaryKey) (res *models.Product, err error) {
 
 	if !util.IsValidUUID(req.Id) {
-		return nil, errors.New("Invalid ID")
+		return nil, errors.New("invalid ID")
 	}
 
 	res, err = c.store.Product().GetPkey(req)
@@ -60,7 +60,7 @@ func (c *Controller) GetProductByPkey(req *models.ProductPrimaryKey) (res *model
 func (c *Controller) DeleteProduct(req *models.ProductPrimaryKey) (res int, err error) {
 
 	if !util.IsValidUUID(req.Id) {
-		return 1, errors.New("Invalid ID")
+		return 1, errors.New("invalid ID")
 	}
 
 	res, err = c.store.Product().Delete(req)
