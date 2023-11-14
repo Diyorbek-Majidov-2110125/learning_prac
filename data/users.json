@@ -1,32 +1,16 @@
 [
   {
-   "id": "19a477c4-6f1e-4444-97eb-8a48b292c30c",
-   "name": "Diyorbek",
-   "surname": "Majidov",
-   "birthday": "2001-10-30"
+   "id": "791eb41b-4b42-4eaa-ac95-06df4ace43bf",
+   "name": "",
+   "surname": "",
+   "birthday": "",
+   "balance": 1003000
   },
   {
-   "id": "fde6f01e-f710-4600-b2e2-fee501837395",
-   "name": "Diyorbek",
-   "surname": "Majidov",
-   "birthday": "2001-10-30"
-  },
-  {
-   "id": "9856e46a-b914-49c5-93d7-dfea50f6e779",
-   "name": "Hamidjon",
-   "surname": "Majidov",
-   "birthday": "2001-10-30"
-  },
-  {
-   "id": "668f9621-62bb-45ea-af3f-82a40713b4d7",
-   "name": "Mustafo",
-   "surname": "Majidov",
-   "birthday": "2001-10-30"
-  },
-  {
-   "id": "937fd508-87bd-4d91-9fe4-f640fd56b12d",
-   "name": "Sasha",
-   "surname": "G'aniyev",
-   "birthday": "2006-10-30"
+   "id": "a0c86706-efda-41cb-9e25-d28bba85483c",
+   "name": "",
+   "surname": "",
+   "birthday": "",
+   "balance": 896970
   }
  ]

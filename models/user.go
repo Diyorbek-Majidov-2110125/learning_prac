@@ -9,6 +9,7 @@ type CreateUser struct {
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
 	Birthday string `json:"birthday"`
+	Balance float64 `json:"balance"`
 }
 
 type User struct {
@@ -16,6 +17,7 @@ type User struct {
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
 	Birthday string `json:"birthday"`
+	Balance float64 `json:"balance"`
 }
 
 type UpdateUser struct {
@@ -23,6 +25,7 @@ type UpdateUser struct {
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
 	Birthday string `json:"birthday"`
+	Balance float64 `json:"balance"`
 }
 
 type GetListRequest struct {
@@ -39,4 +42,11 @@ type GetListResponse struct {
 type GetListDate struct {
 	FromDate string `json:"fromdate"`
 	ToDate   string `json:"todate"`
+}
+
+type TransferBalance struct {
+	SenderId string `json:"sender_id"`
+	ReceiverId string `json:"receiver_id"`
+	Money float64 `json:"money"`
+	Service_fee_percentage float64 `json:"service_fee_percentage"`
 }
