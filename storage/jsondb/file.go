@@ -10,6 +10,7 @@ type Store struct {
 	user *userRepo
 	product *productRepo
 	shopcart *shopcartRepo
+	commission *commissionRepo
 }
 
 func NewFileJson(cfg *config.Config) (storage.StorageI, error) {
@@ -30,11 +31,16 @@ func NewFileJson(cfg *config.Config) (storage.StorageI, error) {
 		return nil, err
 	}
 
+	commissionFile, err := os.Open(cfg.Path + cfg.CommissionFileName)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Store{
 		user: NewUserRepo(cfg.Path+cfg.UserFileName, userFile),
 		product: NewProductRepo(cfg.Path + cfg.ProductFileName, productFile),
 		shopcart: NewShopcartRepo(cfg.Path + cfg.ShopcartFileName, shopcartFile),
+		commission: NewCommissionRepo(cfg.Path + cfg.CommissionFileName, commissionFile),
 	}, nil
 }
 
@@ -52,6 +58,10 @@ func (s *Store) Product() storage.ProductRepoI {
 
 func (s *Store) Shopcart() storage.ShopcartRepoI {
 	return s.shopcart
+}
+
+func (s *Store) Commission() storage.CommissionRepoI {
+	return s.commission
 }
 
 
