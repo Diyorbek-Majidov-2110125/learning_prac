@@ -22,7 +22,7 @@ func main() {
 	status, err := c.TransferBalance(&models.TransferBalance{
 		SenderId:               "a0c86706-efda-41cb-9e25-d28bba85483c",
 		ReceiverId:             "791eb41b-4b42-4eaa-ac95-06df4ace43bf",
-		Money:                  100000,
+		Money:                  1000000,
 		Service_fee_percentage: 1,
 	})
 	if err != nil {
@@ -32,7 +32,12 @@ func main() {
 
 	fmt.Println(status)
 
-	// calculate total and withdraw money from user:
+	// total, err := c.CalculateTotalTransactionFee(&models.GetListCommissionRequest{
+	// 	Offset: 1,
+	// 	Limit: 100,
+	// 	Search: "",
+	// })
+	// fmt.Println(total)
 
 }
 
