@@ -1,6 +1,38 @@
 package main
 
+import (
+	"app/config"
+	"app/controller"
+	"app/models"
+	"app/storage/jsondb"
+	"fmt"
+)
+
 func main() {
+	cfg := config.Load()
+
+	jsondb, err := jsondb.NewFileJson(&cfg)
+	if err != nil {
+		panic("error while connect to json file: " + err.Error())
+	}
+	defer jsondb.CloseDB()
+
+	c := controller.NewController(&cfg, jsondb)
+
+	status, err := c.TransferBalance(&models.TransferBalance{
+		SenderId:               "a0c86706-efda-41cb-9e25-d28bba85483c",
+		ReceiverId:             "791eb41b-4b42-4eaa-ac95-06df4ace43bf",
+		Money:                  100000,
+		Service_fee_percentage: 1,
+	})
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fmt.Println(status)
+
+	// calculate total and withdraw money from user:
 
 }
 

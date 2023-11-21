@@ -7,6 +7,7 @@ type StorageI interface {
 	User() UserRepoI
 	Product() ProductRepoI
 	Shopcart() ShopcartRepoI
+	Commission() CommissionRepoI
 }
 
 type UserRepoI interface {
@@ -33,4 +34,10 @@ type ShopcartRepoI interface{
 	GetbyId(*models.ShopcartPrimaryKey)(*models.Shopcart, error)
 	GetUserShopcart(*models.CalculateShop)([]models.Shopcart, error)
 	UpdateStatus(*models.UpdateStatus)(string,error)
+}
+
+type CommissionRepoI interface{
+	CreateCommission(*models.CreateCommission)(*models.Commission,error)
+	GetCommission(*models.GetCommission)(*models.Commission,error)
+	GetCommissionList(*models.GetListCommissionRequest)(*models.GetListCommissionResponse,error)
 }

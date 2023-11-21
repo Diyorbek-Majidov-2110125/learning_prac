@@ -4,6 +4,8 @@ import (
 	"app/models"
 	"app/pkg/util"
 	"errors"
+	"fmt"
+	"time"
 )
 
 // "bufio"
@@ -77,7 +79,7 @@ func (c *Controller) Delete(req *models.UserPrimaryKey) (res int, err error) {
 }
 
 func (c *Controller) GetByName(req *models.GetListRequest) (res *[]models.User, err error) {
-	
+
 	res, err = c.store.User().GetByName(req)
 	if err != nil {
 		return nil, err
@@ -112,13 +114,12 @@ func (c *Controller) WithdrawUserBalance(id *models.UserPrimaryKey, balance floa
 		return err
 	}
 
-	
 	_, err = c.store.User().Update(&models.UpdateUser{
-		Id: user.Id,
-		Name: user.Name,
-		Surname: user.Surname,
+		Id:       user.Id,
+		Name:     user.Name,
+		Surname:  user.Surname,
 		Birthday: user.Birthday,
-		Balance: user.Balance,
+		Balance:  user.Balance,
 	})
 	if err != nil {
 		return err
@@ -127,7 +128,6 @@ func (c *Controller) WithdrawUserBalance(id *models.UserPrimaryKey, balance floa
 }
 
 func (c *Controller) TransferBalance(req *models.TransferBalance) (res string, err error) {
-
 
 	sender, err := c.store.User().GetPkey(&models.UserPrimaryKey{
 		Id: req.SenderId,
@@ -142,20 +142,31 @@ func (c *Controller) TransferBalance(req *models.TransferBalance) (res string, e
 		return "failure", errors.New("receiver not found")
 	}
 
-	if sender.Balance < req.Money  + req.Money * req.Service_fee_percentage/100 {
+	if sender.Balance < req.Money+req.Money*req.Service_fee_percentage/100 {
 		return "not enough money", errors.New("not enough balance available")
 	}
 
 	_, err = c.store.User().Update(&models.UpdateUser{
-		Id: req.SenderId,
-		Balance: sender.Balance - (req.Money + req.Service_fee_percentage * req.Money/100),
+		Id:      req.SenderId,
+		Balance: sender.Balance - (req.Money + req.Service_fee_percentage*req.Money/100),
 	})
 	if err != nil {
 		return "Sender Updated unsuccessfully", err
 	}
 
+	_, err = c.store.Commission().CreateCommission(&models.CreateCommission{
+		SenderId:        req.SenderId,
+		ReceiverId:      req.ReceiverId,
+		Transaction_fee: req.Money * req.Service_fee_percentage / 100.0,
+		Transacton_time: time.Time.Format(time.Now(), "2006-01-01 01:01:01"),
+	})
+	if err != nil {
+		fmt.Println("error", err)
+		return "", err
+	}
+
 	_, err = c.store.User().Update(&models.UpdateUser{
-		Id: req.ReceiverId,
+		Id:      req.ReceiverId,
 		Balance: receiver.Balance + req.Money,
 	})
 	if err != nil {
@@ -163,8 +174,6 @@ func (c *Controller) TransferBalance(req *models.TransferBalance) (res string, e
 	}
 	return "Success", nil
 }
-
-
 
 // func CreateUser(data models.User) {
 // 	Users = append(Users, data)
