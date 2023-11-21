@@ -158,7 +158,7 @@ func (c *Controller) TransferBalance(req *models.TransferBalance) (res string, e
 		SenderId:        req.SenderId,
 		ReceiverId:      req.ReceiverId,
 		Transaction_fee: req.Money * req.Service_fee_percentage / 100.0,
-		Transacton_time: time.Time.Format(time.Now(), "2006-01-01 01:01:01"),
+		Transacton_time: time.Now().Format("2006-01-02 15:04:05"),
 	})
 	if err != nil {
 		fmt.Println("error", err)
